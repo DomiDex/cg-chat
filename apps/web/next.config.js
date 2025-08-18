@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  
+
   // Experimental features
   experimental: {
     serverActions: {
@@ -10,26 +10,16 @@ const nextConfig = {
     // ppr: true, // Partial Prerendering - only available in canary
     // reactCompiler: false, // Will enable when stable
   },
-  
+
   // Transpile workspace packages
-  transpilePackages: [
-    '@cg/convex-client',
-    '@cg/types',
-    '@cg/utils',
-    '@cg/config',
-    'convex',
-  ],
-  
+  transpilePackages: ['@cg/convex-client', '@cg/types', '@cg/utils', '@cg/config', 'convex'],
+
   // Image optimization
   images: {
-    domains: [
-      'localhost',
-      'computerguys.com',
-      'convex.cloud',
-    ],
+    domains: ['localhost', 'computerguys.com', 'convex.cloud'],
     formats: ['image/avif', 'image/webp'],
   },
-  
+
   // Headers for security
   async headers() {
     return [
@@ -38,25 +28,25 @@ const nextConfig = {
         headers: [
           {
             key: 'X-DNS-Prefetch-Control',
-            value: 'on'
+            value: 'on',
           },
           {
             key: 'X-Frame-Options',
-            value: 'SAMEORIGIN'
+            value: 'SAMEORIGIN',
           },
           {
             key: 'X-Content-Type-Options',
-            value: 'nosniff'
+            value: 'nosniff',
           },
           {
             key: 'Referrer-Policy',
-            value: 'origin-when-cross-origin'
+            value: 'origin-when-cross-origin',
           },
         ],
       },
     ];
   },
-  
+
   // Redirects
   async redirects() {
     return [
@@ -67,15 +57,15 @@ const nextConfig = {
       },
     ];
   },
-  
+
   // Environment variables
   env: {
     NEXT_PUBLIC_APP_NAME: 'Computer Guys Chat',
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
   },
-  
+
   // Webpack configuration
-  webpack: (config, { dev, isServer }) => {
+  webpack: (config, { isServer }) => {
     // Add custom webpack configurations if needed
     if (!isServer) {
       config.resolve.fallback = {
@@ -85,7 +75,7 @@ const nextConfig = {
         tls: false,
       };
     }
-    
+
     return config;
   },
 };

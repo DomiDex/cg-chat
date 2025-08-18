@@ -22,14 +22,14 @@ export default [
       '*.config.mjs',
       '*.config.ts',
       'pnpm-lock.yaml',
-      '*.tsbuildinfo'
+      '*.tsbuildinfo',
     ],
   },
-  
+
   js.configs.recommended,
-  
+
   ...typescript.configs.recommended,
-  
+
   {
     files: ['**/*.js', '**/*.jsx', '**/*.ts', '**/*.tsx'],
     languageOptions: {
@@ -61,7 +61,7 @@ export default [
       '@typescript-eslint/explicit-module-boundary-types': 'off',
       '@typescript-eslint/no-non-null-assertion': 'warn',
       '@typescript-eslint/no-empty-interface': 'warn',
-      
+
       'no-console': [
         'warn',
         {
@@ -76,11 +76,11 @@ export default [
       'object-shorthand': 'error',
       'no-nested-ternary': 'error',
       'no-unneeded-ternary': 'error',
-      'eqeqeq': ['error', 'always', { null: 'ignore' }],
+      eqeqeq: ['error', 'always', { null: 'ignore' }],
       'no-throw-literal': 'error',
     },
   },
-  
+
   {
     files: ['**/*.test.{js,jsx,ts,tsx}', '**/*.spec.{js,jsx,ts,tsx}'],
     rules: {
@@ -88,7 +88,7 @@ export default [
       'no-console': 'off',
     },
   },
-  
+
   {
     files: ['scripts/**/*.js', '*.config.{js,mjs,ts}', '.lintstagedrc.js'],
     rules: {
@@ -97,6 +97,6 @@ export default [
       '@typescript-eslint/no-require-imports': 'off',
     },
   },
-  
+
   prettierConfig,
 ];

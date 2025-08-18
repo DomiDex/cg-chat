@@ -7,12 +7,14 @@ export const createConversation = mutation({
     userId: v.id('users'),
     title: v.optional(v.string()),
     channel: v.union(v.literal('web'), v.literal('whatsapp'), v.literal('email'), v.literal('api')),
-    metadata: v.optional(v.object({
-      source: v.optional(v.string()),
-      referrer: v.optional(v.string()),
-      userAgent: v.optional(v.string()),
-      ipAddress: v.optional(v.string()),
-    })),
+    metadata: v.optional(
+      v.object({
+        source: v.optional(v.string()),
+        referrer: v.optional(v.string()),
+        userAgent: v.optional(v.string()),
+        ipAddress: v.optional(v.string()),
+      })
+    ),
   },
   handler: async (ctx, args) => {
     const conversationId = await ctx.db.insert('conversations', {
@@ -190,7 +192,7 @@ export const searchConversations = query({
     if (args.status) {
       conversations = await ctx.db
         .query('conversations')
-        .withIndex('by_status', (q) => q.eq('status', args.status!))
+        .withIndex('by_status', (q) => q.eq('status', args.status))
         .order('desc')
         .take(limit * 2);
     } else {
@@ -239,7 +241,7 @@ export const getConversationStats = query({
     if (args.userId) {
       conversations = await ctx.db
         .query('conversations')
-        .withIndex('by_user', (q) => q.eq('userId', args.userId!))
+        .withIndex('by_user', (q) => q.eq('userId', args.userId))
         .collect();
     } else {
       conversations = await ctx.db.query('conversations').collect();

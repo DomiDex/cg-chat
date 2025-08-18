@@ -14,20 +14,13 @@ export default function LoginPage() {
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle>Welcome Back</CardTitle>
-          <CardDescription>
-            Enter your email to receive a verification code
-          </CardDescription>
+          <CardDescription>Enter your email to receive a verification code</CardDescription>
         </CardHeader>
         <CardContent>
           <form className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
-              <Input 
-                id="email"
-                type="email"
-                placeholder="you@example.com"
-                required
-              />
+              <Input id="email" type="email" placeholder="you@example.com" required />
             </div>
             <Button className="w-full" type="submit" disabled>
               Send Verification Code

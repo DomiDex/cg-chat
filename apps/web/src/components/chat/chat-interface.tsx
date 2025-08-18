@@ -10,22 +10,25 @@ interface ChatInterfaceProps {
   userId?: string;
 }
 
-export function ChatInterface({ mode = 'demo', userId }: ChatInterfaceProps) {
+export function ChatInterface(_props: ChatInterfaceProps) {
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<Array<{ role: string; content: string }>>([]);
 
   const handleSend = () => {
     if (!input.trim()) return;
-    
-    setMessages(prev => [...prev, { role: 'user', content: input }]);
+
+    setMessages((prev) => [...prev, { role: 'user', content: input }]);
     setInput('');
-    
+
     // Simulate AI response
     setTimeout(() => {
-      setMessages(prev => [...prev, { 
-        role: 'assistant', 
-        content: 'This is a demo response. The actual AI integration will be connected soon.' 
-      }]);
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: 'assistant',
+          content: 'This is a demo response. The actual AI integration will be connected soon.',
+        },
+      ]);
     }, 1000);
   };
 
@@ -39,19 +42,22 @@ export function ChatInterface({ mode = 'demo', userId }: ChatInterfaceProps) {
           </div>
         ) : (
           messages.map((msg, idx) => (
-            <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-              <div className={`max-w-[70%] rounded-lg px-4 py-2 ${
-                msg.role === 'user' 
-                  ? 'bg-primary text-primary-foreground' 
-                  : 'bg-muted'
-              }`}>
+            <div
+              key={idx}
+              className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+            >
+              <div
+                className={`max-w-[70%] rounded-lg px-4 py-2 ${
+                  msg.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted'
+                }`}
+              >
                 {msg.content}
               </div>
             </div>
           ))
         )}
       </div>
-      
+
       <div className="border-t p-4">
         <div className="flex gap-2">
           <Input

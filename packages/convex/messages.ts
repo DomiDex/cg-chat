@@ -12,25 +12,35 @@ export const sendMessage = mutation({
       v.literal('tool')
     ),
     content: v.string(),
-    metadata: v.optional(v.object({
-      model: v.optional(v.string()),
-      tokens: v.optional(v.object({
-        prompt: v.number(),
-        completion: v.number(),
-        total: v.number(),
-      })),
-      latency: v.optional(v.number()),
-      cost: v.optional(v.number()),
-      toolCalls: v.optional(v.array(v.object({
-        id: v.string(),
-        type: v.string(),
-        function: v.optional(v.object({
-          name: v.string(),
-          arguments: v.string(),
-        })),
-      }))),
-      citations: v.optional(v.array(v.string())),
-    })),
+    metadata: v.optional(
+      v.object({
+        model: v.optional(v.string()),
+        tokens: v.optional(
+          v.object({
+            prompt: v.number(),
+            completion: v.number(),
+            total: v.number(),
+          })
+        ),
+        latency: v.optional(v.number()),
+        cost: v.optional(v.number()),
+        toolCalls: v.optional(
+          v.array(
+            v.object({
+              id: v.string(),
+              type: v.string(),
+              function: v.optional(
+                v.object({
+                  name: v.string(),
+                  arguments: v.string(),
+                })
+              ),
+            })
+          )
+        ),
+        citations: v.optional(v.array(v.string())),
+      })
+    ),
     attachments: v.optional(
       v.array(
         v.object({
@@ -174,25 +184,35 @@ export const sendAgentMessage = mutation({
     confidence: v.number(),
     intent: v.optional(v.string()),
     sentiment: v.optional(v.string()),
-    metadata: v.optional(v.object({
-      model: v.optional(v.string()),
-      tokens: v.optional(v.object({
-        prompt: v.number(),
-        completion: v.number(),
-        total: v.number(),
-      })),
-      latency: v.optional(v.number()),
-      cost: v.optional(v.number()),
-      toolCalls: v.optional(v.array(v.object({
-        id: v.string(),
-        type: v.string(),
-        function: v.optional(v.object({
-          name: v.string(),
-          arguments: v.string(),
-        })),
-      }))),
-      citations: v.optional(v.array(v.string())),
-    })),
+    metadata: v.optional(
+      v.object({
+        model: v.optional(v.string()),
+        tokens: v.optional(
+          v.object({
+            prompt: v.number(),
+            completion: v.number(),
+            total: v.number(),
+          })
+        ),
+        latency: v.optional(v.number()),
+        cost: v.optional(v.number()),
+        toolCalls: v.optional(
+          v.array(
+            v.object({
+              id: v.string(),
+              type: v.string(),
+              function: v.optional(
+                v.object({
+                  name: v.string(),
+                  arguments: v.string(),
+                })
+              ),
+            })
+          )
+        ),
+        citations: v.optional(v.array(v.string())),
+      })
+    ),
   },
   handler: async (ctx, args) => {
     const messageId = await ctx.db.insert('messages', {
@@ -279,7 +299,7 @@ export const searchMessages = query({
     if (args.conversationId) {
       messages = await ctx.db
         .query('messages')
-        .withIndex('by_conversation', (q) => q.eq('conversationId', args.conversationId!))
+        .withIndex('by_conversation', (q) => q.eq('conversationId', args.conversationId))
         .take(1000);
     } else {
       messages = await ctx.db.query('messages').take(1000);
