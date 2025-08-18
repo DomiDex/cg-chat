@@ -1,0 +1,10 @@
+packages:
+  # Convex backend package
+  - "packages/convex"
+
+  # Applications
+  - "apps/*"
+
+  # Shared packages
+  - "packages/*"
+  - "packages/@cg/*"

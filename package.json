@@ -1,0 +1,64 @@
+{
+  "name": "cg-chat",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Computer Guys AI-powered customer service chatbot",
+  "author": "Computer Guys Development Team",
+  "license": "PROPRIETARY",
+  "engines": {
+    "node": ">=20.18.0",
+    "pnpm": ">=9.0.0"
+  },
+  "packageManager": "pnpm@9.15.4",
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "husky"
+    ],
+    "peerDependencyRules": {
+      "allowedVersions": {
+        "react": "19",
+        "react-dom": "19"
+      }
+    }
+  },
+  "scripts": {
+    "dev": "turbo dev --parallel",
+    "build": "turbo build",
+    "clean": "turbo clean && rm -rf node_modules",
+    "type-check": "turbo type-check",
+    "lint": "turbo lint",
+    "format": "turbo format",
+    "test": "turbo test",
+    "test:unit": "turbo test:unit",
+    "test:integration": "turbo test:integration",
+    "test:e2e": "turbo test:e2e",
+    "convex:dev": "pnpm --filter convex dev",
+    "convex:deploy": "pnpm --filter convex deploy",
+    "convex:codegen": "pnpm --filter convex codegen",
+    "web:dev": "pnpm --filter web dev",
+    "api:dev": "pnpm --filter api dev",
+    "prepare": "husky",
+    "postinstall": "pnpm run validate:env",
+    "validate:env": "node scripts/validate-env.js",
+    "deps:check": "pnpm outdated --recursive",
+    "deps:update": "pnpm update --recursive --interactive",
+    "reset": "pnpm clean && rm -rf pnpm-lock.yaml && pnpm install"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.29.6",
+    "@types/node": "^24.0.14",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.1.5",
+    "prettier": "^3.6.2",
+    "turbo": "^2.5.6",
+    "typescript": "^5.8.3"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "prettier --write"
+    ],
+    "*.{json,md,yml,yaml}": [
+      "prettier --write"
+    ]
+  }
+}

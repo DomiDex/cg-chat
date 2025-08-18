@@ -1,0 +1,18 @@
+{
+  "name": "convex",
+  "version": "1.0.0",
+  "private": true,
+  "main": "./_generated/api.js",
+  "types": "./_generated/api.d.ts",
+  "scripts": {
+    "dev": "convex dev",
+    "deploy": "convex deploy",
+    "codegen": "convex codegen",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint . --ext .ts",
+    "format": "prettier --write ."
+  },
+  "dependencies": {
+    "convex": "^1.25.4"
+  }
+}
