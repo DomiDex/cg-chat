@@ -218,3 +218,149 @@ export const MAX_CONVERSATION_MESSAGES = 1000;
 export const SESSION_TIMEOUT = 30 * 60 * 1000;
 export const TOKEN_EXPIRY = 15 * 60 * 1000;
 export const REFRESH_TOKEN_EXPIRY = 7 * 24 * 60 * 60 * 1000;
+
+// Brand types for type safety
+export type Brand<K, T> = K & { __brand: T };
+
+export type UserId = Brand<string, 'UserId'>;
+export type ConversationId = Brand<string, 'ConversationId'>;
+export type MessageId = Brand<string, 'MessageId'>;
+export type AgentId = Brand<string, 'AgentId'>;
+export type SessionId = Brand<string, 'SessionId'>;
+export type ApiKeyId = Brand<string, 'ApiKeyId'>;
+
+// Result types for error handling
+export type Result<T, E = Error> = 
+  | { success: true; data: T }
+  | { success: false; error: E };
+
+export type AsyncResult<T, E = Error> = Promise<Result<T, E>>;
+
+// Pagination types
+export interface PaginationParams {
+  page?: number;
+  limit?: number;
+  cursor?: string;
+  sort?: string;
+  order?: 'asc' | 'desc';
+}
+
+export interface PaginatedResponse<T> {
+  items: T[];
+  total: number;
+  page: number;
+  pages: number;
+  hasMore: boolean;
+  cursor?: string;
+}
+
+// Filter types
+export interface FilterParams {
+  search?: string;
+  status?: string[];
+  tags?: string[];
+  dateFrom?: Date;
+  dateTo?: Date;
+  [key: string]: any;
+}
+
+// Event types
+export interface EventPayload<T = any> {
+  type: string;
+  data: T;
+  timestamp: number;
+  source: string;
+  metadata?: Record<string, any>;
+}
+
+// WebSocket message types
+export interface WSMessage<T = any> {
+  id: string;
+  type: WSMessageType;
+  payload: T;
+  timestamp: number;
+}
+
+export enum WSMessageType {
+  PING = 'ping',
+  PONG = 'pong',
+  MESSAGE = 'message',
+  TYPING = 'typing',
+  PRESENCE = 'presence',
+  ERROR = 'error',
+  ACK = 'ack',
+}
+
+// Error types
+export class AppError extends Error {
+  constructor(
+    message: string,
+    public code: string,
+    public statusCode: number = 500,
+    public details?: any
+  ) {
+    super(message);
+    this.name = 'AppError';
+  }
+}
+
+export class ValidationError extends AppError {
+  constructor(message: string, details?: any) {
+    super(message, 'VALIDATION_ERROR', 400, details);
+    this.name = 'ValidationError';
+  }
+}
+
+export class AuthenticationError extends AppError {
+  constructor(message: string = 'Authentication required') {
+    super(message, 'AUTHENTICATION_ERROR', 401);
+    this.name = 'AuthenticationError';
+  }
+}
+
+export class AuthorizationError extends AppError {
+  constructor(message: string = 'Insufficient permissions') {
+    super(message, 'AUTHORIZATION_ERROR', 403);
+    this.name = 'AuthorizationError';
+  }
+}
+
+export class NotFoundError extends AppError {
+  constructor(resource: string) {
+    super(`${resource} not found`, 'NOT_FOUND', 404);
+    this.name = 'NotFoundError';
+  }
+}
+
+export class RateLimitError extends AppError {
+  constructor(retryAfter: number) {
+    super('Rate limit exceeded', 'RATE_LIMIT_EXCEEDED', 429, { retryAfter });
+    this.name = 'RateLimitError';
+  }
+}
+
+// Utility type helpers
+export type Await<T> = T extends PromiseLike<infer U> ? U : T;
+export type ArrayElement<ArrayType extends readonly unknown[]> = 
+  ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
+export type UnionToIntersection<U> = 
+  (U extends any ? (k: U) => void : never) extends ((k: infer I) => void) ? I : never;
+export type Prettify<T> = {
+  [K in keyof T]: T[K];
+} & {};
+
+// Extract keys of specific type
+export type KeysOfType<T, U> = {
+  [K in keyof T]: T[K] extends U ? K : never;
+}[keyof T];
+
+// Make specific properties optional
+export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
+
+// Make specific properties required
+export type RequiredBy<T, K extends keyof T> = Omit<T, K> & Required<Pick<T, K>>;
+
+// Recursive readonly
+export type DeepReadonly<T> = {
+  readonly [P in keyof T]: T[P] extends object ? DeepReadonly<T[P]> : T[P];
+};
