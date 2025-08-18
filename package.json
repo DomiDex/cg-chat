@@ -88,5 +88,8 @@
     "*.{json,md,yml,yaml}": [
       "prettier --write"
     ]
+  },
+  "dependencies": {
+    "convex": "1.25.4"
   }
 }

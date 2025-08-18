@@ -380,3 +380,13 @@ export const getLatestMessage = query({
     return message && !message.deletedAt ? message : null;
   },
 });
+
+// Get single message by ID
+export const getMessage = query({
+  args: {
+    messageId: v.id('messages'),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db.get(args.messageId);
+  },
+});

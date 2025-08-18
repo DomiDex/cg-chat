@@ -1,0 +1,320 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch", "postgresqlExtensions", "tracing"]
+  binaryTargets   = ["native", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_DATABASE_URL")
+}
+
+// Enable extensions
+model Extension {
+  name String @id
+  @@map("extensions")
+}
+
+// User authentication and profile
+model User {
+  id                String    @id @default(cuid())
+  email             String    @unique
+  emailVerified     Boolean   @default(false)
+  verificationToken String?   @unique
+  verificationExpiry DateTime?
+  phone             String?   @unique
+  name              String?
+  role              Role      @default(USER)
+  customerId        String?   @unique // Computer Guys customer ID
+  
+  // Profile
+  avatar            String?
+  bio               String?
+  preferences       Json      @default("{}")
+  metadata          Json      @default("{}")
+  
+  // Subscription
+  subscriptionTier  SubscriptionTier @default(FREE)
+  subscriptionValidUntil DateTime?
+  
+  // Timestamps
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  lastActive        DateTime?
+  deletedAt         DateTime?
+  
+  // Relations
+  sessions          Session[]
+  auditLogs         AuditLog[]
+  apiKeys           ApiKey[]
+  
+  @@index([email])
+  @@index([customerId])
+  @@index([phone])
+  @@index([createdAt])
+  @@map("users")
+}
+
+// User sessions for authentication
+model Session {
+  id            String   @id @default(cuid())
+  userId        String
+  token         String   @unique
+  refreshToken  String   @unique
+  
+  // Session data
+  ipAddress     String?
+  userAgent     String?
+  deviceId      String?
+  location      Json?    // GeoIP data
+  
+  // Expiry
+  expiresAt     DateTime
+  refreshExpiresAt DateTime
+  lastActivity  DateTime @default(now())
+  
+  // Timestamps
+  createdAt     DateTime @default(now())
+  revokedAt     DateTime?
+  
+  // Relations
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([token])
+  @@index([refreshToken])
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("sessions")
+}
+
+// API Keys for service authentication
+model ApiKey {
+  id            String   @id @default(cuid())
+  userId        String
+  name          String
+  key           String   @unique
+  hashedKey     String   @unique // Store bcrypt hash
+  
+  // Permissions
+  scopes        String[] @default([])
+  rateLimit     Int      @default(100) // Requests per minute
+  
+  // Usage tracking
+  lastUsedAt    DateTime?
+  usageCount    Int      @default(0)
+  
+  // Timestamps
+  expiresAt     DateTime?
+  createdAt     DateTime @default(now())
+  revokedAt     DateTime?
+  
+  // Relations
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([key])
+  @@index([hashedKey])
+  @@index([userId])
+  @@map("api_keys")
+}
+
+// Audit logging for compliance
+model AuditLog {
+  id            String   @id @default(cuid())
+  userId        String?
+  action        String
+  entity        String
+  entityId      String?
+  
+  // Audit data
+  oldValues     Json?
+  newValues     Json?
+  metadata      Json?
+  
+  // Request context
+  ipAddress     String?
+  userAgent     String?
+  requestId     String?
+  
+  // Timestamp
+  createdAt     DateTime @default(now())
+  
+  // Relations
+  user          User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  
+  @@index([userId])
+  @@index([entity, entityId])
+  @@index([action])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+// Rate limiting tracking
+model RateLimit {
+  id            String   @id @default(cuid())
+  identifier    String   // IP or userId
+  endpoint      String
+  
+  // Window tracking
+  windowStart   DateTime
+  windowEnd     DateTime
+  requestCount  Int      @default(0)
+  
+  // Timestamps
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@unique([identifier, endpoint, windowStart])
+  @@index([identifier])
+  @@index([windowEnd])
+  @@map("rate_limits")
+}
+
+// Webhook events for async processing
+model WebhookEvent {
+  id            String   @id @default(cuid())
+  source        String   // twilio, stripe, etc
+  eventType     String
+  
+  // Event data
+  payload       Json
+  headers       Json?
+  signature     String?
+  
+  // Processing
+  status        WebhookStatus @default(PENDING)
+  attempts      Int      @default(0)
+  lastError     String?
+  processedAt   DateTime?
+  
+  // Timestamps
+  receivedAt    DateTime @default(now())
+  scheduledFor  DateTime?
+  
+  @@index([source, eventType])
+  @@index([status])
+  @@index([receivedAt])
+  @@map("webhook_events")
+}
+
+// Email queue for transactional emails
+model EmailQueue {
+  id            String   @id @default(cuid())
+  to            String[]
+  cc            String[] @default([])
+  bcc           String[] @default([])
+  
+  // Email content
+  subject       String
+  html          String?
+  text          String?
+  template      String?
+  templateData  Json?
+  
+  // Metadata
+  priority      Priority @default(NORMAL)
+  category      String?
+  tags          String[] @default([])
+  
+  // Processing
+  status        EmailStatus @default(PENDING)
+  attempts      Int      @default(0)
+  lastError     String?
+  messageId     String?
+  
+  // Timestamps
+  scheduledFor  DateTime @default(now())
+  sentAt        DateTime?
+  createdAt     DateTime @default(now())
+  
+  @@index([status])
+  @@index([scheduledFor])
+  @@index([to])
+  @@map("email_queue")
+}
+
+// Feature flags for gradual rollouts
+model FeatureFlag {
+  id            String   @id @default(cuid())
+  key           String   @unique
+  name          String
+  description   String?
+  
+  // Flag configuration
+  enabled       Boolean  @default(false)
+  value         Json?    // Can store complex configurations
+  rules         Json?    // Targeting rules
+  
+  // Rollout
+  percentage    Int      @default(0) // 0-100
+  userIds       String[] @default([]) // Specific users
+  
+  // Timestamps
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  enabledAt     DateTime?
+  disabledAt    DateTime?
+  
+  @@index([key])
+  @@index([enabled])
+  @@map("feature_flags")
+}
+
+// System configuration
+model SystemConfig {
+  key           String   @id
+  value         Json
+  description   String?
+  
+  // Metadata
+  dataType      String   @default("string") // string, number, boolean, json
+  isSecret      Boolean  @default(false)
+  isReadOnly    Boolean  @default(false)
+  
+  // Timestamps
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@map("system_config")
+}
+
+// Enums
+enum Role {
+  USER
+  ADMIN
+  AGENT
+  DEVELOPER
+  SUPPORT
+}
+
+enum SubscriptionTier {
+  FREE
+  PRO
+  ENTERPRISE
+  CUSTOM
+}
+
+enum WebhookStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+enum EmailStatus {
+  PENDING
+  QUEUED
+  SENDING
+  SENT
+  FAILED
+  BOUNCED
+  COMPLAINT
+}
+
+enum Priority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
+}

@@ -10,7 +10,7 @@
     "jsxImportSource": "hono/jsx",
 
     "outDir": "./dist",
-    "rootDir": "./src",
+    "rootDirs": ["./src", "../../packages"],
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,

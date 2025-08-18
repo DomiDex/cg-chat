@@ -3,12 +3,43 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
+  "main": "dist/index.js",
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
     "type-check": "tsc --noEmit",
     "lint": "eslint . --ext .ts",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "test": "vitest",
+    "test:coverage": "vitest --coverage",
+    "docker:build": "docker build -t cg-api .",
+    "docker:run": "docker run -p 3001:3001 --env-file .env cg-api",
+    "docker:compose": "docker-compose up"
+  },
+  "dependencies": {
+    "hono": "^4.9.2",
+    "@hono/node-server": "^1.14.0",
+    "@hono/zod-validator": "^0.4.2",
+    "zod": "^3.24.1",
+    "dotenv": "^16.4.7",
+    "jsonwebtoken": "^9.0.2",
+    "bcryptjs": "^2.4.3",
+    "axios": "^1.7.9",
+    "ioredis": "^5.4.2",
+    "pino": "^9.5.0",
+    "pino-pretty": "^13.0.1",
+    "twilio": "^5.4.0",
+    "convex": "^1.25.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.17.14",
+    "@types/jsonwebtoken": "^9.0.8",
+    "@types/bcryptjs": "^2.4.6",
+    "tsx": "^4.20.0",
+    "nodemon": "^3.1.0",
+    "typescript": "^5.7.3",
+    "vitest": "^2.1.8",
+    "@vitest/coverage-v8": "^2.1.8"
   }
 }

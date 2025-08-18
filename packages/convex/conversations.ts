@@ -330,3 +330,26 @@ export const deleteConversation = mutation({
     return { success: true };
   },
 });
+
+// Get active WhatsApp conversation for a user
+export const getActiveWhatsAppConversation = query({
+  args: {
+    userId: v.id('users'),
+    phoneNumber: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const conversations = await ctx.db
+      .query('conversations')
+      .withIndex('by_user', (q) => q.eq('userId', args.userId))
+      .filter((q) => 
+        q.and(
+          q.eq(q.field('channel'), 'whatsapp'),
+          q.eq(q.field('status'), 'active')
+        )
+      )
+      .order('desc')
+      .first();
+
+    return conversations;
+  },
+});

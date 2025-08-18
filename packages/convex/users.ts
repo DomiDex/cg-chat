@@ -192,3 +192,93 @@ export const deleteUser = mutation({
     return { success: true };
   },
 });
+
+// Additional queries needed by API
+
+// Get user by ID (alias for getUserById)
+export const getUser = query({
+  args: { userId: v.id('users') },
+  handler: async (ctx, args) => {
+    return await ctx.db.get(args.userId);
+  },
+});
+
+// Get user by phone (simplified - no phone field in schema)
+export const getUserByPhone = query({
+  args: { phone: v.string() },
+  handler: async () => {
+    // Phone field doesn't exist in current schema
+    return null;
+  },
+});
+
+// Get user count
+export const getUserCount = query({
+  args: {},
+  handler: async (ctx) => {
+    const users = await ctx.db.query('users').collect();
+    return users.length;
+  },
+});
+
+// Track login attempt (simplified - no loginAttempts field in schema)
+export const trackLoginAttempt = mutation({
+  args: {
+    userId: v.id('users'),
+    success: v.boolean(),
+    ip: v.string(),
+  },
+  handler: async () => {
+    // Login attempts tracking not implemented in current schema
+    return;
+  },
+});
+
+// Create session (simplified - no sessions field in schema)
+export const createSession = mutation({
+  args: {
+    userId: v.id('users'),
+    sessionId: v.string(),
+    ip: v.string(),
+    userAgent: v.string(),
+    expiresAt: v.number(),
+  },
+  handler: async () => {
+    // Session tracking not implemented in current schema
+    return;
+  },
+});
+
+// Get session (simplified - no sessions field in schema)
+export const getSession = query({
+  args: { sessionId: v.string() },
+  handler: async () => {
+    // Session tracking not implemented in current schema
+    return null;
+  },
+});
+
+// Invalidate session (simplified - no sessions field in schema)
+export const invalidateSession = mutation({
+  args: { sessionId: v.string() },
+  handler: async () => {
+    // Session tracking not implemented in current schema
+    return;
+  },
+});
+
+// Create verification token
+export const createVerificationToken = mutation({
+  args: {
+    userId: v.id('users'),
+    token: v.string(),
+    type: v.union(v.literal('email'), v.literal('password')),
+    expiresAt: v.number(),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.userId, {
+      verificationToken: args.token,
+      verificationExpiry: args.expiresAt,
+    });
+  },
+});

@@ -6,11 +6,28 @@ export default defineSchema({
   users: defineTable({
     email: v.string(),
     emailVerified: v.boolean(),
+    passwordHash: v.optional(v.string()), // BCrypt hashed password
     verificationToken: v.optional(v.string()),
     verificationExpiry: v.optional(v.number()),
     name: v.optional(v.string()),
     role: v.union(v.literal('user'), v.literal('admin'), v.literal('agent')),
+    status: v.optional(v.union(
+      v.literal('active'),
+      v.literal('inactive'),
+      v.literal('suspended'),
+      v.literal('deleted')
+    )),
     customerId: v.optional(v.string()), // CG customer ID
+    profile: v.optional(
+      v.object({
+        firstName: v.optional(v.string()),
+        lastName: v.optional(v.string()),
+        phone: v.optional(v.string()),
+        avatar: v.optional(v.string()),
+        company: v.optional(v.string()),
+        address: v.optional(v.string()),
+      })
+    ),
     preferences: v.optional(
       v.object({
         notifications: v.boolean(),
@@ -19,6 +36,14 @@ export default defineSchema({
       })
     ),
     metadata: v.optional(v.any()),
+    loginAttempts: v.optional(v.array(
+      v.object({
+        success: v.boolean(),
+        ip: v.string(),
+        timestamp: v.number(),
+      })
+    )),
+    lastLoginAt: v.optional(v.number()),
     createdAt: v.number(),
     updatedAt: v.number(),
     lastActive: v.optional(v.number()),
