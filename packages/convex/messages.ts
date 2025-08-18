@@ -297,9 +297,10 @@ export const searchMessages = query({
 
     let messages;
     if (args.conversationId) {
+      const conversationId = args.conversationId;
       messages = await ctx.db
         .query('messages')
-        .withIndex('by_conversation', (q) => q.eq('conversationId', args.conversationId))
+        .withIndex('by_conversation', (q) => q.eq('conversationId', conversationId))
         .take(1000);
     } else {
       messages = await ctx.db.query('messages').take(1000);

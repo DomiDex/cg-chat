@@ -190,9 +190,10 @@ export const searchConversations = query({
 
     let conversations;
     if (args.status) {
+      const status = args.status;
       conversations = await ctx.db
         .query('conversations')
-        .withIndex('by_status', (q) => q.eq('status', args.status))
+        .withIndex('by_status', (q) => q.eq('status', status))
         .order('desc')
         .take(limit * 2);
     } else {
@@ -239,9 +240,10 @@ export const getConversationStats = query({
     let conversations;
 
     if (args.userId) {
+      const userId = args.userId;
       conversations = await ctx.db
         .query('conversations')
-        .withIndex('by_user', (q) => q.eq('userId', args.userId))
+        .withIndex('by_user', (q) => q.eq('userId', userId))
         .collect();
     } else {
       conversations = await ctx.db.query('conversations').collect();
