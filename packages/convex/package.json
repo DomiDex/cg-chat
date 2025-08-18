@@ -7,12 +7,21 @@
   "scripts": {
     "dev": "convex dev",
     "deploy": "convex deploy",
+    "deploy:prod": "convex deploy --prod",
     "codegen": "convex codegen",
     "type-check": "tsc --noEmit",
     "lint": "eslint . --ext .ts",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "import": "convex import",
+    "export": "convex export",
+    "logs": "convex logs",
+    "dashboard": "convex dashboard"
   },
   "dependencies": {
     "convex": "^1.25.4"
+  },
+  "devDependencies": {
+    "@types/node": "24.0.14",
+    "typescript": "5.8.3"
   }
 }
