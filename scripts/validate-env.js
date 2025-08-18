@@ -1,16 +1,16 @@
-const fs = require("fs");
-const path = require("path");
+const fs = require('fs');
+const path = require('path');
 
 const requiredEnvVars = [
-  "NODE_ENV",
-  "CONVEX_DEPLOYMENT",
-  "CONVEX_URL",
-  "DATABASE_URL",
-  "TWILIO_ACCOUNT_SID",
-  "TWILIO_AUTH_TOKEN",
-  "OPENROUTER_API_KEY",
-  "JWT_SECRET",
-  "NEON_DATABASE_URL",
+  'NODE_ENV',
+  'CONVEX_DEPLOYMENT',
+  'CONVEX_URL',
+  'DATABASE_URL',
+  'TWILIO_ACCOUNT_SID',
+  'TWILIO_AUTH_TOKEN',
+  'OPENROUTER_API_KEY',
+  'JWT_SECRET',
+  'NEON_DATABASE_URL',
 ];
 
 const envExample = `# Environment Configuration Template
@@ -53,27 +53,27 @@ SENTRY_DSN=
 `;
 
 function validateEnvironment() {
-  console.log("🔍 Validating environment configuration...\n");
+  console.log('🔍 Validating environment configuration...\n');
 
   // Create .env.example if it doesn't exist
-  const envExamplePath = path.join(process.cwd(), ".env.example");
+  const envExamplePath = path.join(process.cwd(), '.env.example');
   if (!fs.existsSync(envExamplePath)) {
     fs.writeFileSync(envExamplePath, envExample);
-    console.log("✅ Created .env.example file");
+    console.log('✅ Created .env.example file');
   }
 
   // Check for .env.local
-  const envLocalPath = path.join(process.cwd(), ".env.local");
+  const envLocalPath = path.join(process.cwd(), '.env.local');
   if (!fs.existsSync(envLocalPath)) {
-    console.warn("⚠️  Warning: .env.local file not found");
+    console.warn('⚠️  Warning: .env.local file not found');
     console.log(
-      "   Please copy .env.example to .env.local and configure your environment variables\n",
+      '   Please copy .env.example to .env.local and configure your environment variables\n'
     );
     return;
   }
 
   // In production, validate required variables
-  if (process.env.NODE_ENV === "production") {
+  if (process.env.NODE_ENV === 'production') {
     const missing = [];
     for (const varName of requiredEnvVars) {
       if (!process.env[varName]) {
@@ -82,13 +82,13 @@ function validateEnvironment() {
     }
 
     if (missing.length > 0) {
-      console.error("❌ Missing required environment variables:");
+      console.error('❌ Missing required environment variables:');
       missing.forEach((v) => console.error(`   - ${v}`));
       process.exit(1);
     }
   }
 
-  console.log("✅ Environment validation complete\n");
+  console.log('✅ Environment validation complete\n');
 }
 
 // Run validation

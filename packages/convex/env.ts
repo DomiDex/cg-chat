@@ -1,4 +1,4 @@
-import { action } from "./_generated/server";
+import { action } from './_generated/server';
 
 // Environment configuration action
 export const getConfig = action({
@@ -8,7 +8,7 @@ export const getConfig = action({
       openRouterApiKey: process.env.OPENROUTER_API_KEY,
       twilioAccountSid: process.env.TWILIO_ACCOUNT_SID,
       twilioAuthToken: process.env.TWILIO_AUTH_TOKEN,
-      isDevelopment: process.env.NODE_ENV === "development",
+      isDevelopment: process.env.NODE_ENV === 'development',
     };
   },
 });
@@ -18,9 +18,9 @@ export const healthCheck = action({
   args: {},
   handler: async () => {
     return {
-      status: "healthy",
+      status: 'healthy',
       timestamp: Date.now(),
-      environment: process.env.NODE_ENV || "development",
+      environment: process.env.NODE_ENV || 'development',
     };
   },
 });
@@ -32,10 +32,9 @@ export const getApiKeys = action({
     // TODO: Add authentication check
     return {
       hasOpenRouter: !!process.env.OPENROUTER_API_KEY,
-      hasTwilio:
-        !!process.env.TWILIO_ACCOUNT_SID && !!process.env.TWILIO_AUTH_TOKEN,
+      hasTwilio: !!process.env.TWILIO_ACCOUNT_SID && !!process.env.TWILIO_AUTH_TOKEN,
       hasJwtSecret: !!process.env.JWT_SECRET,
-      environment: process.env.NODE_ENV || "development",
+      environment: process.env.NODE_ENV || 'development',
     };
   },
 });
@@ -45,10 +44,10 @@ export const validateEnvironment = action({
   args: {},
   handler: async () => {
     const required = [
-      "OPENROUTER_API_KEY",
-      "TWILIO_ACCOUNT_SID",
-      "TWILIO_AUTH_TOKEN",
-      "JWT_SECRET",
+      'OPENROUTER_API_KEY',
+      'TWILIO_ACCOUNT_SID',
+      'TWILIO_AUTH_TOKEN',
+      'JWT_SECRET',
     ];
 
     const missing: string[] = [];
@@ -66,7 +65,7 @@ export const validateEnvironment = action({
       valid: missing.length === 0,
       missing,
       present,
-      environment: process.env.NODE_ENV || "development",
+      environment: process.env.NODE_ENV || 'development',
     };
   },
 });

@@ -1,25 +1,25 @@
-import { v } from "convex/values";
-import { mutation, query } from "./_generated/server";
+import { v } from 'convex/values';
+import { mutation, query } from './_generated/server';
 
 // Create a new conversation
 export const createConversation = mutation({
   args: {
-    userId: v.id("users"),
+    userId: v.id('users'),
     title: v.optional(v.string()),
-    channel: v.union(
-      v.literal("web"),
-      v.literal("whatsapp"),
-      v.literal("email"),
-      v.literal("api"),
-    ),
-    metadata: v.optional(v.any()),
+    channel: v.union(v.literal('web'), v.literal('whatsapp'), v.literal('email'), v.literal('api')),
+    metadata: v.optional(v.object({
+      source: v.optional(v.string()),
+      referrer: v.optional(v.string()),
+      userAgent: v.optional(v.string()),
+      ipAddress: v.optional(v.string()),
+    })),
   },
   handler: async (ctx, args) => {
-    const conversationId = await ctx.db.insert("conversations", {
+    const conversationId = await ctx.db.insert('conversations', {
       userId: args.userId,
       title: args.title,
-      status: "active",
-      priority: "medium",
+      status: 'active',
+      priority: 'medium',
       channel: args.channel,
       metadata: args.metadata,
       tags: [],
@@ -28,10 +28,10 @@ export const createConversation = mutation({
     });
 
     // Create initial system message
-    await ctx.db.insert("messages", {
+    await ctx.db.insert('messages', {
       conversationId,
-      role: "system",
-      content: "Welcome to Computer Guys! How can I help you today?",
+      role: 'system',
+      content: 'Welcome to Computer Guys! How can I help you today?',
       createdAt: Date.now(),
     });
 
@@ -42,33 +42,33 @@ export const createConversation = mutation({
 // Get conversations for a user
 export const getUserConversations = query({
   args: {
-    userId: v.id("users"),
+    userId: v.id('users'),
     status: v.optional(
       v.union(
-        v.literal("active"),
-        v.literal("archived"),
-        v.literal("resolved"),
-        v.literal("escalated"),
-      ),
+        v.literal('active'),
+        v.literal('archived'),
+        v.literal('resolved'),
+        v.literal('escalated')
+      )
     ),
   },
   handler: async (ctx, args) => {
-    let query = ctx.db
-      .query("conversations")
-      .withIndex("by_user", (q) => q.eq("userId", args.userId));
+    const query = ctx.db
+      .query('conversations')
+      .withIndex('by_user', (q) => q.eq('userId', args.userId));
 
     if (args.status) {
       const conversations = await query.collect();
       return conversations.filter((c) => c.status === args.status);
     }
 
-    return await query.order("desc").take(50);
+    return await query.order('desc').take(50);
   },
 });
 
 // Get single conversation
 export const getConversation = query({
-  args: { conversationId: v.id("conversations") },
+  args: { conversationId: v.id('conversations') },
   handler: async (ctx, args) => {
     return await ctx.db.get(args.conversationId);
   },
@@ -77,38 +77,33 @@ export const getConversation = query({
 // Update conversation
 export const updateConversation = mutation({
   args: {
-    conversationId: v.id("conversations"),
+    conversationId: v.id('conversations'),
     updates: v.object({
       title: v.optional(v.string()),
       status: v.optional(
         v.union(
-          v.literal("active"),
-          v.literal("archived"),
-          v.literal("resolved"),
-          v.literal("escalated"),
-        ),
+          v.literal('active'),
+          v.literal('archived'),
+          v.literal('resolved'),
+          v.literal('escalated')
+        )
       ),
       priority: v.optional(
-        v.union(
-          v.literal("low"),
-          v.literal("medium"),
-          v.literal("high"),
-          v.literal("urgent"),
-        ),
+        v.union(v.literal('low'), v.literal('medium'), v.literal('high'), v.literal('urgent'))
       ),
-      agentId: v.optional(v.id("agents")),
+      agentId: v.optional(v.id('agents')),
       tags: v.optional(v.array(v.string())),
     }),
   },
   handler: async (ctx, args) => {
     const { conversationId, updates } = args;
 
-    const updateData: any = {
+    const updateData: Record<string, unknown> = {
       ...updates,
       updatedAt: Date.now(),
     };
 
-    if (updates.status === "resolved") {
+    if (updates.status === 'resolved') {
       updateData.resolvedAt = Date.now();
     }
 
@@ -121,11 +116,11 @@ export const updateConversation = mutation({
 // Archive conversation
 export const archiveConversation = mutation({
   args: {
-    conversationId: v.id("conversations"),
+    conversationId: v.id('conversations'),
   },
   handler: async (ctx, args) => {
     await ctx.db.patch(args.conversationId, {
-      status: "archived",
+      status: 'archived',
       updatedAt: Date.now(),
     });
 
@@ -136,35 +131,30 @@ export const archiveConversation = mutation({
 // Escalate conversation to human agent
 export const escalateConversation = mutation({
   args: {
-    conversationId: v.id("conversations"),
+    conversationId: v.id('conversations'),
     reason: v.optional(v.string()),
     priority: v.optional(
-      v.union(
-        v.literal("low"),
-        v.literal("medium"),
-        v.literal("high"),
-        v.literal("urgent"),
-      ),
+      v.union(v.literal('low'), v.literal('medium'), v.literal('high'), v.literal('urgent'))
     ),
   },
   handler: async (ctx, args) => {
     const conversation = await ctx.db.get(args.conversationId);
 
     if (!conversation) {
-      throw new Error("Conversation not found");
+      throw new Error('Conversation not found');
     }
 
     await ctx.db.patch(args.conversationId, {
-      status: "escalated",
-      priority: args.priority || "high",
+      status: 'escalated',
+      priority: args.priority || 'high',
       updatedAt: Date.now(),
     });
 
     // Create escalation message
-    await ctx.db.insert("messages", {
+    await ctx.db.insert('messages', {
       conversationId: args.conversationId,
-      role: "system",
-      content: `Conversation escalated to human agent. ${args.reason ? `Reason: ${args.reason}` : ""}`,
+      role: 'system',
+      content: `Conversation escalated to human agent. ${args.reason ? `Reason: ${args.reason}` : ''}`,
       createdAt: Date.now(),
     });
 
@@ -180,19 +170,14 @@ export const searchConversations = query({
     searchTerm: v.optional(v.string()),
     status: v.optional(
       v.union(
-        v.literal("active"),
-        v.literal("archived"),
-        v.literal("resolved"),
-        v.literal("escalated"),
-      ),
+        v.literal('active'),
+        v.literal('archived'),
+        v.literal('resolved'),
+        v.literal('escalated')
+      )
     ),
     channel: v.optional(
-      v.union(
-        v.literal("web"),
-        v.literal("whatsapp"),
-        v.literal("email"),
-        v.literal("api"),
-      ),
+      v.union(v.literal('web'), v.literal('whatsapp'), v.literal('email'), v.literal('api'))
     ),
     startDate: v.optional(v.number()),
     endDate: v.optional(v.number()),
@@ -204,14 +189,14 @@ export const searchConversations = query({
     let conversations;
     if (args.status) {
       conversations = await ctx.db
-        .query("conversations")
-        .withIndex("by_status", (q) => q.eq("status", args.status!))
-        .order("desc")
+        .query('conversations')
+        .withIndex('by_status', (q) => q.eq('status', args.status))
+        .order('desc')
         .take(limit * 2);
     } else {
       conversations = await ctx.db
-        .query("conversations")
-        .order("desc")
+        .query('conversations')
+        .order('desc')
         .take(limit * 2);
     }
 
@@ -233,9 +218,7 @@ export const searchConversations = query({
     // Filter by search term in title
     if (args.searchTerm) {
       const searchLower = args.searchTerm.toLowerCase();
-      conversations = conversations.filter((c) =>
-        c.title?.toLowerCase().includes(searchLower),
-      );
+      conversations = conversations.filter((c) => c.title?.toLowerCase().includes(searchLower));
     }
 
     return conversations.slice(0, limit);
@@ -245,8 +228,8 @@ export const searchConversations = query({
 // Get conversation statistics
 export const getConversationStats = query({
   args: {
-    userId: v.optional(v.id("users")),
-    agentId: v.optional(v.id("agents")),
+    userId: v.optional(v.id('users')),
+    agentId: v.optional(v.id('agents')),
     startDate: v.optional(v.number()),
     endDate: v.optional(v.number()),
   },
@@ -255,11 +238,11 @@ export const getConversationStats = query({
 
     if (args.userId) {
       conversations = await ctx.db
-        .query("conversations")
-        .withIndex("by_user", (q) => q.eq("userId", args.userId!))
+        .query('conversations')
+        .withIndex('by_user', (q) => q.eq('userId', args.userId))
         .collect();
     } else {
-      conversations = await ctx.db.query("conversations").collect();
+      conversations = await ctx.db.query('conversations').collect();
     }
 
     // Filter by agent if specified
@@ -280,34 +263,29 @@ export const getConversationStats = query({
     // Calculate statistics
     const stats = {
       total: conversations.length,
-      active: conversations.filter((c) => c.status === "active").length,
-      resolved: conversations.filter((c) => c.status === "resolved").length,
-      escalated: conversations.filter((c) => c.status === "escalated").length,
-      archived: conversations.filter((c) => c.status === "archived").length,
+      active: conversations.filter((c) => c.status === 'active').length,
+      resolved: conversations.filter((c) => c.status === 'resolved').length,
+      escalated: conversations.filter((c) => c.status === 'escalated').length,
+      archived: conversations.filter((c) => c.status === 'archived').length,
       byChannel: {
-        web: conversations.filter((c) => c.channel === "web").length,
-        whatsapp: conversations.filter((c) => c.channel === "whatsapp").length,
-        email: conversations.filter((c) => c.channel === "email").length,
-        api: conversations.filter((c) => c.channel === "api").length,
+        web: conversations.filter((c) => c.channel === 'web').length,
+        whatsapp: conversations.filter((c) => c.channel === 'whatsapp').length,
+        email: conversations.filter((c) => c.channel === 'email').length,
+        api: conversations.filter((c) => c.channel === 'api').length,
       },
       byPriority: {
-        low: conversations.filter((c) => c.priority === "low").length,
-        medium: conversations.filter((c) => c.priority === "medium").length,
-        high: conversations.filter((c) => c.priority === "high").length,
-        urgent: conversations.filter((c) => c.priority === "urgent").length,
+        low: conversations.filter((c) => c.priority === 'low').length,
+        medium: conversations.filter((c) => c.priority === 'medium').length,
+        high: conversations.filter((c) => c.priority === 'high').length,
+        urgent: conversations.filter((c) => c.priority === 'urgent').length,
       },
       avgResolutionTime: 0,
     };
 
     // Calculate average resolution time
-    const resolved = conversations.filter(
-      (c) => c.status === "resolved" && c.resolvedAt,
-    );
+    const resolved = conversations.filter((c) => c.status === 'resolved' && c.resolvedAt);
     if (resolved.length > 0) {
-      const totalTime = resolved.reduce(
-        (sum, c) => sum + ((c.resolvedAt || 0) - c.createdAt),
-        0,
-      );
+      const totalTime = resolved.reduce((sum, c) => sum + ((c.resolvedAt || 0) - c.createdAt), 0);
       stats.avgResolutionTime = Math.round(totalTime / resolved.length);
     }
 
@@ -318,27 +296,25 @@ export const getConversationStats = query({
 // Delete conversation (soft delete)
 export const deleteConversation = mutation({
   args: {
-    conversationId: v.id("conversations"),
+    conversationId: v.id('conversations'),
   },
   handler: async (ctx, args) => {
     const conversation = await ctx.db.get(args.conversationId);
 
     if (!conversation) {
-      throw new Error("Conversation not found");
+      throw new Error('Conversation not found');
     }
 
     // Archive the conversation instead of deleting
     await ctx.db.patch(args.conversationId, {
-      status: "archived",
+      status: 'archived',
       updatedAt: Date.now(),
     });
 
     // Mark all messages as deleted
     const messages = await ctx.db
-      .query("messages")
-      .withIndex("by_conversation", (q) =>
-        q.eq("conversationId", args.conversationId),
-      )
+      .query('messages')
+      .withIndex('by_conversation', (q) => q.eq('conversationId', args.conversationId))
       .collect();
 
     for (const message of messages) {

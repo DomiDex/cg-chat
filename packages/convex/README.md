@@ -1,6 +1,7 @@
 # Convex Backend Package
 
-This package contains the Convex backend implementation for the Computer Guys AI chatbot system.
+This package contains the Convex backend implementation for the Computer Guys AI
+chatbot system.
 
 ## 📁 Structure
 
@@ -135,7 +136,7 @@ Convex provides real-time subscriptions out of the box:
 ```typescript
 // Subscribe to messages
 const messages = useQuery(api.messages.subscribeToMessages, {
-  conversationId: "conversation_id",
+  conversationId: 'conversation_id',
 });
 ```
 
