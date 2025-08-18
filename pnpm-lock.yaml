@@ -50,6 +50,13 @@ importers:
       convex:
         specifier: ^1.25.4
         version: 1.25.4
+    devDependencies:
+      "@types/node":
+        specifier: 24.0.14
+        version: 24.0.14
+      typescript:
+        specifier: 5.8.3
+        version: 5.8.3
 
   packages/database:
     dependencies:
