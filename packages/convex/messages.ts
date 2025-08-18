@@ -279,7 +279,7 @@ export const searchMessages = query({
     if (args.conversationId) {
       messages = await ctx.db
         .query('messages')
-        .withIndex('by_conversation', (q) => q.eq('conversationId', args.conversationId))
+        .withIndex('by_conversation', (q) => q.eq('conversationId', args.conversationId!))
         .take(1000);
     } else {
       messages = await ctx.db.query('messages').take(1000);
@@ -316,8 +316,8 @@ export const addToolCallMessage = mutation({
   args: {
     conversationId: v.id('conversations'),
     toolName: v.string(),
-    toolInput: v.unknown(),
-    toolOutput: v.unknown(),
+    toolInput: v.any(),
+    toolOutput: v.any(),
     duration: v.optional(v.number()),
   },
   handler: async (ctx, args) => {

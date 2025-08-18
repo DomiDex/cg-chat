@@ -58,7 +58,7 @@ export const getAgents = query({
     if (args.type) {
       agents = await ctx.db
         .query('agents')
-        .withIndex('by_type', (q) => q.eq('type', args.type))
+        .withIndex('by_type', (q) => q.eq('type', args.type!))
         .collect();
     } else {
       agents = await ctx.db.query('agents').collect();
