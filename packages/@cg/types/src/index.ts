@@ -3,10 +3,10 @@ export interface User {
   email: string;
   emailVerified: boolean;
   name?: string;
-  role: "user" | "admin" | "agent";
+  role: 'user' | 'admin' | 'agent';
   customerId?: string;
   preferences?: UserPreferences;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   createdAt: number;
   updatedAt: number;
   lastActive?: number;
@@ -20,7 +20,7 @@ export interface UserPreferences {
 }
 
 export interface Subscription {
-  tier: "free" | "pro" | "enterprise";
+  tier: 'free' | 'pro' | 'enterprise';
   validUntil: number;
   features: string[];
 }
@@ -43,13 +43,9 @@ export interface Conversation {
   lastMessageAt?: number;
 }
 
-export type ConversationStatus =
-  | "active"
-  | "archived"
-  | "resolved"
-  | "escalated";
-export type Priority = "low" | "medium" | "high" | "urgent";
-export type Channel = "web" | "whatsapp" | "email" | "api";
+export type ConversationStatus = 'active' | 'archived' | 'resolved' | 'escalated';
+export type Priority = 'low' | 'medium' | 'high' | 'urgent';
+export type Channel = 'web' | 'whatsapp' | 'email' | 'api';
 
 export interface ConversationMetadata {
   source?: string;
@@ -77,7 +73,7 @@ export interface Message {
   createdAt: number;
 }
 
-export type MessageRole = "user" | "assistant" | "system" | "tool";
+export type MessageRole = 'user' | 'assistant' | 'system' | 'tool';
 
 export interface Attachment {
   type: string;
@@ -91,7 +87,14 @@ export interface MessageMetadata {
   tokens?: TokenUsage;
   latency?: number;
   cost?: number;
-  toolCalls?: any[];
+  toolCalls?: Array<{
+    id: string;
+    type: string;
+    function?: {
+      name: string;
+      arguments: string;
+    };
+  }>;
   citations?: string[];
 }
 
@@ -113,7 +116,7 @@ export interface Agent {
   id: string;
   name: string;
   type: AgentType;
-  status: "active" | "inactive";
+  status: 'active' | 'inactive';
   capabilities: string[];
   tools: string[];
   modelConfig: ModelConfig;
@@ -123,12 +126,7 @@ export interface Agent {
   updatedAt: number;
 }
 
-export type AgentType =
-  | "chat"
-  | "support"
-  | "technical"
-  | "sales"
-  | "escalation";
+export type AgentType = 'chat' | 'support' | 'technical' | 'sales' | 'escalation';
 
 export interface ModelConfig {
   provider: string;
@@ -151,7 +149,7 @@ export interface AgentMetrics {
   escalationRate: number;
 }
 
-export interface ApiRequest<T = any> {
+export interface ApiRequest<T = unknown> {
   method: string;
   path: string;
   headers: Record<string, string>;
@@ -160,7 +158,7 @@ export interface ApiRequest<T = any> {
   params?: Record<string, string>;
 }
 
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   success: boolean;
   data?: T;
   error?: ApiError;
@@ -170,7 +168,7 @@ export interface ApiResponse<T = any> {
 export interface ApiError {
   code: string;
   message: string;
-  details?: any;
+  details?: unknown;
   stack?: string;
 }
 
@@ -208,8 +206,7 @@ export type DeepPartial<T> = {
 };
 
 export type RequireAtLeastOne<T> = {
-  [K in keyof T]-?: Required<Pick<T, K>> &
-    Partial<Pick<T, Exclude<keyof T, K>>>;
+  [K in keyof T]-?: Required<Pick<T, K>> & Partial<Pick<T, Exclude<keyof T, K>>>;
 }[keyof T];
 
 export type Nullable<T> = T | null;

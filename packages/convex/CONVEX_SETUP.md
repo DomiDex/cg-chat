@@ -1,6 +1,7 @@
 # 🚀 Convex Setup & Deployment Guide
 
-This guide will walk you through setting up Convex for the Computer Guys chatbot project.
+This guide will walk you through setting up Convex for the Computer Guys chatbot
+project.
 
 ## Prerequisites
 
@@ -228,7 +229,8 @@ npx convex dev --clear     # Clear and redeploy
 
 1. **Keep `convex dev` running** during development for real-time sync
 2. **Run `codegen`** after any schema changes
-3. **Never commit** `.convex/` directory or `convex.json` (already in .gitignore)
+3. **Never commit** `.convex/` directory or `convex.json` (already in
+   .gitignore)
 4. **Vector search** requires OpenAI API key for embeddings
 5. **Rate limiting** is enforced at database level
 
@@ -247,25 +249,25 @@ Create a test file to verify everything works:
 
 ```typescript
 // test-convex.ts
-import { ConvexClient } from "convex/browser";
+import { ConvexClient } from 'convex/browser';
 
 const client = new ConvexClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
 async function test() {
   // Test user creation
-  const userId = await client.mutation("users:createUser", {
-    email: "test@example.com",
-    name: "Test User",
+  const userId = await client.mutation('users:createUser', {
+    email: 'test@example.com',
+    name: 'Test User',
   });
 
-  console.log("Created user:", userId);
+  console.log('Created user:', userId);
 
   // Test query
-  const user = await client.query("users:getUserByEmail", {
-    email: "test@example.com",
+  const user = await client.query('users:getUserByEmail', {
+    email: 'test@example.com',
   });
 
-  console.log("Found user:", user);
+  console.log('Found user:', user);
 }
 
 test().catch(console.error);
@@ -342,4 +344,5 @@ npx convex env list
 
 ---
 
-Once you complete these steps, your Convex backend will be fully operational and ready for the Computer Guys chatbot application!
+Once you complete these steps, your Convex backend will be fully operational and
+ready for the Computer Guys chatbot application!

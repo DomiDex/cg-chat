@@ -12,10 +12,51 @@
   "typescript.inlayHints.functionLikeReturnTypes.enabled": true,
   "typescript.inlayHints.enumMemberValues.enabled": true,
   "typescript.inlayHints.parameterTypes.enabled": true,
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": false,
   "editor.codeActionsOnSave": {
-    "source.organizeImports": "explicit",
-    "source.fixAll.ts": "explicit"
+    "source.fixAll.eslint": "explicit",
+    "source.organizeImports": "never"
   },
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[markdown]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "eslint.enable": true,
+  "eslint.packageManager": "pnpm",
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact"
+  ],
+  "eslint.workingDirectories": [
+    { "mode": "auto" }
+  ],
+  "eslint.options": {
+    "overrideConfigFile": "eslint.config.mjs"
+  },
+  "prettier.enable": true,
+  "prettier.requireConfig": true,
+  "prettier.useEditorConfig": false,
   "files.exclude": {
     "**/.git": true,
     "**/.svn": true,
@@ -36,5 +77,11 @@
     "**/.next": true,
     "**/coverage": true,
     "pnpm-lock.yaml": true
+  },
+  "files.associations": {
+    "*.css": "css",
+    ".prettierrc": "json",
+    ".lintstagedrc": "json",
+    ".env*": "dotenv"
   }
 }
