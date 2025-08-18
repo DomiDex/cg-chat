@@ -24,8 +24,10 @@
   "scripts": {
     "dev": "turbo dev --parallel",
     "build": "turbo build",
+    "build:types": "node scripts/build-with-types.js",
     "clean": "turbo clean && rm -rf node_modules",
-    "type-check": "turbo type-check",
+    "type-check": "node scripts/type-check.js",
+    "type-check:turbo": "turbo type-check",
     "lint": "turbo lint",
     "format": "turbo format",
     "test": "turbo test",
